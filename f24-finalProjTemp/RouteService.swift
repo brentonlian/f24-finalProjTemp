@@ -17,12 +17,12 @@ import Foundation
 
 struct RouteService {
     public static func fetchRoutes(latitude: String, longitude: String, maxDistance: String) async throws -> [Route] {
-        // apiKey env var
-        guard let apiKey = ProcessInfo.processInfo.environment["apiKey"] else{
+        // Ensure the API key is available
+        guard let apiKey = ProcessInfo.processInfo.environment["apiKey"] else {
             fatalError("apiKey not set in the environment")
         }
+
         // Build the URL with query parameters
-        //let urlString = "https://your-api-url.com/routes?lat=\(latitude)&lon=\(longitude)&distance=\(maxDistance)"
         let urlString = "https://external.transitapp.com/v3/public/nearby_routes?lat=\(latitude)&lon=\(longitude)&max_distance=\(maxDistance)"
         guard let url = URL(string: urlString) else { fatalError("Invalid URL") }
         print("Request URL: \(url)")
@@ -30,7 +30,7 @@ struct RouteService {
         // Create the request
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.addValue(apiKey, forHTTPHeaderField: "Authorization")
+        request.addValue(apiKey, forHTTPHeaderField: "apiKey") // Use "apiKey" as the header field name
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // Perform the network call
@@ -61,6 +61,7 @@ struct RouteService {
         }
     }
 }
+
 
 
 
