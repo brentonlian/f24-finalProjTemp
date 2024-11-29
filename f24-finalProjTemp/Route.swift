@@ -18,7 +18,7 @@ struct Welcome: Codable {
 }
 
 // MARK: - Route
-struct Route: Codable {
+struct Route: Identifiable, Codable {
     let compactDisplayShortName: DisplayShortName
     let globalRouteID: String
     let itineraries: [Itinerary]
@@ -33,10 +33,10 @@ struct Route: Codable {
     let routeTextColor: String
     let routeType: Int
     let sortingKey, ttsLongName, ttsShortName: String
-    //new property
-    var isSelected: Bool = false
-    //UUID to be identifiable
-    //var id: UUID = UUID()
+
+    /// New properties
+    var isSelected: Bool = false // Tracks selection state
+    var id: String { globalRouteID } // Use globalRouteID as a unique identifier
 
     enum CodingKeys: String, CodingKey {
         case compactDisplayShortName = "compact_display_short_name"
@@ -58,6 +58,7 @@ struct Route: Codable {
         case ttsShortName = "tts_short_name"
     }
 }
+
 
 // MARK: - DisplayShortName
 struct DisplayShortName: Codable {
