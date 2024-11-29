@@ -24,13 +24,13 @@ struct Route: Codable {
     let itineraries: [Itinerary]
     let modeName: ModeName
     let realTimeRouteID: String
-    let routeColor: RouteColor
+    let routeColor: String
     let routeDisplayShortName: DisplayShortName
     let routeImage, routeLongName: String
-    let routeNetworkID: RouteNetworkID
-    let routeNetworkName: RouteNetworkName
+    let routeNetworkID: String
+    let routeNetworkName: String
     let routeShortName: String
-    let routeTextColor: RouteTextColor
+    let routeTextColor: String
     let routeType: Int
     let sortingKey, ttsLongName, ttsShortName: String
 
@@ -137,24 +137,25 @@ enum ModeName: String, Codable {
     case bus = "Bus"
 }
 
-enum RouteColor: String, Codable {
-    case e87F0E = "e87f0e"
-    case the62A744 = "62a744"
-}
+//Changed to string
+//enum RouteColor: String, Codable {
+    //case e87F0E = "e87f0e"
+    //case the62A744 = "62a744"
+//}
 
-enum RouteNetworkID: String, Codable {
-    case goTriangleRaleigh = "GoTriangle|Raleigh"
-    case piedmontAuthorityForRegionalTransportationPARTGreensboro = "Piedmont Authority for Regional Transportation (PART)|Greensboro"
-}
+//enum RouteNetworkID: String, Codable {
+    //case goTriangleRaleigh = "GoTriangle|Raleigh"
+    //case piedmontAuthorityForRegionalTransportationPARTGreensboro = "Piedmont Authority for Regional Transportation (PART)|Greensboro"
+//}
 
-enum RouteNetworkName: String, Codable {
-    case goTriangle = "GoTriangle"
-    case piedmontAuthorityForRegionalTransportationPART = "Piedmont Authority for Regional Transportation (PART)"
-}
+//enum RouteNetworkName: String, Codable {
+    //case goTriangle = "GoTriangle"
+    //case piedmontAuthorityForRegionalTransportationPART = "Piedmont Authority for Regional Transportation (PART)"
+//}
 
-enum RouteTextColor: String, Codable {
-    case ffffff = "ffffff"
-}
+//enum RouteTextColor: String, Codable {
+    //case ffffff = "ffffff"
+//}
 
 // MARK: - Encode/decode helpers
 
