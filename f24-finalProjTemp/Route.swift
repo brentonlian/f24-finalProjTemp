@@ -22,7 +22,7 @@ struct Route: Codable {
     let compactDisplayShortName: DisplayShortName
     let globalRouteID: String
     let itineraries: [Itinerary]
-    let modeName: ModeName
+    let modeName: String
     let realTimeRouteID: String
     let routeColor: String
     let routeDisplayShortName: DisplayShortName
@@ -92,7 +92,8 @@ struct Itinerary: Codable {
 struct ClosestStop: Codable {
     let globalStopID: String
     let locationType: Int
-    let parentStationGlobalStopID: JSONNull?
+    //Changed from JSONNull? to String?
+    let parentStationGlobalStopID: String?
     let routeType: Int
     let rtStopID, stopCode: String
     let stopLat, stopLon: Double
@@ -133,9 +134,10 @@ struct ScheduleItem: Codable {
     }
 }
 
-enum ModeName: String, Codable {
-    case bus = "Bus"
-}
+//Change to String
+//enum ModeName: String, Codable {
+    //case bus = "Bus"
+//}
 
 //Changed to string
 //enum RouteColor: String, Codable {
