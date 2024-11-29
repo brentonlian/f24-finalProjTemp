@@ -33,6 +33,10 @@ struct Route: Codable {
     let routeTextColor: String
     let routeType: Int
     let sortingKey, ttsLongName, ttsShortName: String
+    //new property
+    var isSelected: Bool = false
+    //UUID to be identifiable
+    //var id: UUID = UUID()
 
     enum CodingKeys: String, CodingKey {
         case compactDisplayShortName = "compact_display_short_name"

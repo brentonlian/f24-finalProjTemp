@@ -13,28 +13,24 @@ struct NearbyRoutesView: View {
                 .font(.headline)
                 .padding()
 
-            // Latitude Text Field
             TextField("Enter Latitude", text: $latitude)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 .keyboardType(.decimalPad)
 
-            // Longitude Text Field
             TextField("Enter Longitude", text: $longitude)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 .keyboardType(.decimalPad)
 
-            // Max Distance Text Field
             TextField("Enter Max Distance", text: $maxDistance)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 .keyboardType(.numberPad)
 
-            // Submit Button
             Button(action: {
                 Task {
                     await fetchNearbyRoutes()
@@ -49,22 +45,21 @@ struct NearbyRoutesView: View {
             }
             .padding(.top)
 
-            // Display Error Message if Exists
             if let errorMessage = errorMessage {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
             }
 
-            // Display Routes
             if !routes.isEmpty {
-                List(routes, id: \.globalRouteID) { route in
-                    VStack(alignment: .leading) {
-                        Text(route.routeLongName)
-                            .font(.headline)
-                        Text("Short Name: \(route.routeShortName)")
-                            .font(.subheadline)
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        ForEach($routes) { $route in
+                            RouteView(route: route, isSelected: $route.isSelected)
+                        }
                     }
                 }
+                .frame(maxHeight: 300)
+                .scrollIndicators(.visible)
             }
 
             Spacer()
@@ -72,29 +67,23 @@ struct NearbyRoutesView: View {
         .padding()
     }
 
-    // MARK: - Fetch Routes
     func fetchNearbyRoutes() async {
         do {
-            // Validate input before making the request
             guard !latitude.isEmpty, !longitude.isEmpty, !maxDistance.isEmpty else {
                 self.errorMessage = "All fields must be filled in."
                 return
             }
 
-            // Call the API
             let fetchedRoutes = try await RouteService.fetchRoutes(
                 latitude: latitude,
                 longitude: longitude,
                 maxDistance: maxDistance
             )
-            
-            // Update the state
             DispatchQueue.main.async {
                 self.routes = fetchedRoutes
                 self.errorMessage = nil
             }
         } catch {
-            // Handle and display the error
             DispatchQueue.main.async {
                 self.errorMessage = error.localizedDescription
                 self.routes = []
@@ -102,6 +91,39 @@ struct NearbyRoutesView: View {
         }
     }
 }
+
+
+struct RouteView: View {
+    let route: Route
+    @Binding var isSelected: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(route.routeLongName)
+                .font(.headline)
+                .foregroundColor(.primary)
+            Text("Short Name: \(route.routeShortName)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            // Toggle selection
+            Button(action: {
+                isSelected.toggle()
+            }) {
+                Text(isSelected ? "Deselect" : "Select")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isSelected ? Color.green : Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+}
+
 
 #Preview {
     NearbyRoutesView()
