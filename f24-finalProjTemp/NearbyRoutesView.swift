@@ -6,6 +6,7 @@ struct NearbyRoutesView: View {
     @State private var maxDistance: String = ""
     @State private var routes: [Route] = []
     @State private var errorMessage: String?
+    @State private var selectedRouteID: String?
 
     var body: some View {
         NavigationStack {
@@ -54,10 +55,16 @@ struct NearbyRoutesView: View {
                 if !routes.isEmpty {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(routes, id: \.routeID) { route in
-                                NavigationLink(destination: RouteDetailView(route: route)) {
-                                    RouteRowView(route: route)
-                                }
+                            ForEach(routes, id: \.id) { route in
+                                RouteRowView(
+                                    route: route,
+                                    isSelected: Binding(
+                                        get: { selectedRouteID == route.id },
+                                        set: { isSelected in
+                                            selectedRouteID = isSelected ? route.id : nil
+                                        }
+                                    )
+                                )
                             }
                         }
                     }
@@ -97,19 +104,23 @@ struct NearbyRoutesView: View {
 
 struct RouteRowView: View {
     let route: Route
+    @Binding var isSelected: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(route.routeLongName)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(isSelected ? .blue : .primary)
             Text("Short Name: \(route.routeShortName)")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(isSelected ? Color.blue.opacity(0.2) : Color(.systemGray6))
         .cornerRadius(10)
+        .onTapGesture {
+            isSelected.toggle()
+        }
     }
 }
 
@@ -150,6 +161,8 @@ struct RouteDetailView: View {
     }
 }
 
+
 #Preview {
     NearbyRoutesView()
 }
+
