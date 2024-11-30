@@ -8,63 +8,66 @@ struct NearbyRoutesView: View {
     @State private var errorMessage: String?
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Nearby Routes Finder")
-                .font(.headline)
-                .padding()
-
-            TextField("Enter Latitude", text: $latitude)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .keyboardType(.decimalPad)
-
-            TextField("Enter Longitude", text: $longitude)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .keyboardType(.decimalPad)
-
-            TextField("Enter Max Distance", text: $maxDistance)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .keyboardType(.numberPad)
-
-            Button(action: {
-                Task {
-                    await fetchNearbyRoutes()
-                }
-            }) {
-                Text("Find Routes")
-                    .frame(maxWidth: .infinity)
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Nearby Routes Finder")
+                    .font(.headline)
                     .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
+
+                TextField("Enter Latitude", text: $latitude)
+                    .padding()
+                    .background(Color(.systemGray6))
                     .cornerRadius(10)
-            }
-            .padding(.top)
+                    .keyboardType(.decimalPad)
 
-            if let errorMessage = errorMessage {
-                Text("Error: \(errorMessage)")
-                    .foregroundColor(.red)
-            }
+                TextField("Enter Longitude", text: $longitude)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .keyboardType(.decimalPad)
 
-            if !routes.isEmpty {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 10) {
-                        ForEach($routes) { $route in
-                            RouteView(route: route, isSelected: $route.isSelected)
+                TextField("Enter Max Distance", text: $maxDistance)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .keyboardType(.numberPad)
+
+                Button(action: {
+                    Task {
+                        await fetchNearbyRoutes()
+                    }
+                }) {
+                    Text("Find Routes")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .padding(.top)
+
+                if let errorMessage = errorMessage {
+                    Text("Error: \(errorMessage)")
+                        .foregroundColor(.red)
+                }
+
+                if !routes.isEmpty {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            ForEach(routes, id: \.routeID) { route in
+                                NavigationLink(destination: RouteDetailView(route: route)) {
+                                    RouteRowView(route: route)
+                                }
+                            }
                         }
                     }
+                    .frame(maxHeight: 300)
                 }
-                .frame(maxHeight: 300)
-                .scrollIndicators(.visible)
-            }
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
         }
-        .padding()
     }
 
     func fetchNearbyRoutes() async {
@@ -92,10 +95,8 @@ struct NearbyRoutesView: View {
     }
 }
 
-
-struct RouteView: View {
+struct RouteRowView: View {
     let route: Route
-    @Binding var isSelected: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -105,18 +106,6 @@ struct RouteView: View {
             Text("Short Name: \(route.routeShortName)")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
-            // Toggle selection
-            Button(action: {
-                isSelected.toggle()
-            }) {
-                Text(isSelected ? "Deselect" : "Select")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(isSelected ? Color.green : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
         }
         .padding()
         .background(Color(.systemGray6))
@@ -124,6 +113,42 @@ struct RouteView: View {
     }
 }
 
+struct RouteDetailView: View {
+    let route: Route
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text(route.routeLongName)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Route Short Name: \(route.routeShortName)")
+                .font(.title2)
+
+            if let description = route.description {
+                Text("Description: \(description)")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+
+            Text("Additional Route Details")
+                .font(.headline)
+                .padding(.top)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Route ID: \(route.routeID)")
+                Text("Color: \(route.color)")
+                Text("Text Color: \(route.textColor)")
+                Text("Agency ID: \(route.agencyID)")
+            }
+            .font(.body)
+
+            Spacer()
+        }
+        .padding()
+        .navigationTitle("Route Details")
+    }
+}
 
 #Preview {
     NearbyRoutesView()
