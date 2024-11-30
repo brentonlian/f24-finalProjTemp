@@ -5,8 +5,9 @@ struct NearbyRoutesView: View {
     @State private var longitude: String = ""
     @State private var maxDistance: String = ""
     @State private var routes: [Route] = []
-    @State private var errorMessage: String?
     @State private var selectedRouteID: String?
+    @State private var stops: [ClosestStop] = []
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -56,19 +57,39 @@ struct NearbyRoutesView: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10) {
                             ForEach(routes, id: \.id) { route in
-                                RouteRowView(
-                                    route: route,
-                                    isSelected: Binding(
-                                        get: { selectedRouteID == route.id },
-                                        set: { isSelected in
-                                            selectedRouteID = isSelected ? route.id : nil
-                                        }
+                                Button(action: {
+                                    Task {
+                                        await fetchStops(for: route.id)
+                                    }
+                                }) {
+                                    RouteRowView(
+                                        route: route,
+                                        isSelected: Binding(
+                                            get: { selectedRouteID == route.id },
+                                            set: { isSelected in
+                                                selectedRouteID = isSelected ? route.id : nil
+                                            }
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                     }
                     .frame(maxHeight: 300)
+                }
+
+                if !stops.isEmpty {
+                    Text("Stops for Route \(selectedRouteID ?? "")")
+                        .font(.headline)
+                        .padding(.top)
+
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            ForEach(stops, id: \.globalStopID) { stop in
+                                StopRowView(stop: stop)
+                            }
+                        }
+                    }
                 }
 
                 Spacer()
@@ -100,6 +121,21 @@ struct NearbyRoutesView: View {
             }
         }
     }
+
+    func fetchStops(for routeID: String) async {
+        do {
+            let fetchedStops = try await StopService.fetchStops(globalRouteID: routeID)
+            DispatchQueue.main.async {
+                self.stops = fetchedStops
+                self.errorMessage = nil
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = error.localizedDescription
+                self.stops = []
+            }
+        }
+    }
 }
 
 struct RouteRowView: View {
@@ -124,45 +160,35 @@ struct RouteRowView: View {
     }
 }
 
-struct RouteDetailView: View {
-    let route: Route
+struct StopRowView: View {
+    let stop: ClosestStop
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text(route.routeLongName)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
-            Text("Route Short Name: \(route.routeShortName)")
-                .font(.title2)
-
-            if let description = route.description {
-                Text("Description: \(description)")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-
-            Text("Additional Route Details")
+        VStack(alignment: .leading, spacing: 5) {
+            Text(stop.stopName)
                 .font(.headline)
-                .padding(.top)
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Route ID: \(route.routeID)")
-                Text("Color: \(route.color)")
-                Text("Text Color: \(route.textColor)")
-                Text("Agency ID: \(route.agencyID)")
+            Text("Latitude: \(stop.stopLat)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Text("Longitude: \(stop.stopLon)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            if stop.wheelchairBoarding == 1 {
+                Text("Wheelchair Accessible")
+                    .font(.caption)
+                    .foregroundColor(.green)
+            } else {
+                Text("No Wheelchair Access")
+                    .font(.caption)
+                    .foregroundColor(.red)
             }
-            .font(.body)
-
-            Spacer()
         }
         .padding()
-        .navigationTitle("Route Details")
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
     }
 }
-
 
 #Preview {
     NearbyRoutesView()
 }
-

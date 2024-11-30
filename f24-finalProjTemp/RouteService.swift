@@ -25,7 +25,7 @@ struct RouteService {
         // Build the URL with query parameters
         let urlString = "https://external.transitapp.com/v3/public/nearby_routes?lat=\(latitude)&lon=\(longitude)&max_distance=\(maxDistance)"
         guard let url = URL(string: urlString) else { fatalError("Invalid URL") }
-        print("Request URL: \(url)")
+        //print("Request URL: \(url)")
 
         // Create the request
         var request = URLRequest(url: url)
@@ -39,24 +39,25 @@ struct RouteService {
 
             // Log raw response data
             if let httpResponse = response as? HTTPURLResponse {
-                print("HTTP Status Code: \(httpResponse.statusCode)")
+                //Turned off logging
+                //print("HTTP Status Code: \(httpResponse.statusCode)")
                 if let headers = httpResponse.allHeaderFields as? [String: String] {
-                    print("Response Headers: \(headers)")
+                    //print("Response Headers: \(headers)")
                 }
             }
 
-            print("Raw Data: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
+            //print("Raw Data: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
 
             // Decode the JSON response
             let welcomeResponse = try JSONDecoder().decode(Welcome.self, from: data)
-            print("Decoded Response: \(welcomeResponse)")
+            //print("Decoded Response: \(welcomeResponse)")
 
             // Return the array of routes
             return welcomeResponse.routes
 
         } catch {
             // Log the error
-            print("Error occurred: \(error)")
+            //print("Error occurred: \(error)")
             throw error
         }
     }
