@@ -15,6 +15,7 @@ import Foundation
 // MARK: - Welcome
 struct Welcome: Codable {
     let routes: [Route]
+    //let itineraries: [Itinerary]
 }
 
 // MARK: - Route
