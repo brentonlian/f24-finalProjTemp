@@ -13,7 +13,7 @@ import Foundation
 //   let welcome = try? JSONDecoder().decode(Welcome.self, from: jsonData)
 
 // MARK: - Welcome
-struct Welcome: Codable {
+struct RouteRes: Codable {
     let routes: [Route]
     //let itineraries: [Itinerary]
 }

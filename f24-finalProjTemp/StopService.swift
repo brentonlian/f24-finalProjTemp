@@ -1,14 +1,7 @@
-//
-//  StopService.swift
-//  f24-finalProjTemp
-//
-//  Created by Brenton on 11/29/24.
-//
-
 import Foundation
 
 struct StopService {
-    public static func fetchStops(globalRouteID: String) async throws -> [ClosestStop] {
+    public static func fetchStops(globalRouteID: String) async throws -> [stopStop] {
         // Ensure the API key is available
         guard let apiKey = ProcessInfo.processInfo.environment["apiKey"] else {
             fatalError("apiKey not set in the environment")
@@ -42,11 +35,13 @@ struct StopService {
             print("Raw Data: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
 
             // Decode the JSON response
-            let stopsResponse = try JSONDecoder().decode([ClosestStop].self, from: data)
+            let stopsResponse = try JSONDecoder().decode(stopWelcome.self, from: data)
             print("Decoded Response: \(stopsResponse)")
 
-            // Return the array of stops
-            return stopsResponse
+            // Extract and return the stops from the itineraries
+            let stops = stopsResponse.stopItineraries.flatMap { $0.stopStops }
+            print("Extracted Stops: \(stops)")
+            return stops
 
         } catch {
             // Log the error

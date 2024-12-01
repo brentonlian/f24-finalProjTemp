@@ -6,7 +6,7 @@ struct NearbyRoutesView: View {
     @State private var maxDistance: String = ""
     @State private var routes: [Route] = []
     @State private var selectedRouteID: String?
-    @State private var stops: [ClosestStop] = []
+    @State private var stops: [stopStop] = [] // Updated type
     @State private var errorMessage: String?
 
     var body: some View {
@@ -85,7 +85,7 @@ struct NearbyRoutesView: View {
 
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(stops, id: \.globalStopID) { stop in
+                            ForEach(stops, id: \.stopGlobalID) { stop in // Updated ID
                                 StopRowView(stop: stop)
                             }
                         }
@@ -138,32 +138,8 @@ struct NearbyRoutesView: View {
     }
 }
 
-struct RouteRowView: View {
-    let route: Route
-    let onSelect: () -> Void
-    @Binding var isSelected: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(route.routeLongName)
-                .font(.headline)
-                .foregroundColor(isSelected ? .blue : .primary)
-            Text("Short Name: \(route.routeShortName)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .padding()
-        .background(isSelected ? Color.blue.opacity(0.2) : Color(.systemGray6))
-        .cornerRadius(10)
-        .onTapGesture {
-            isSelected.toggle()
-            onSelect()
-        }
-    }
-}
-
 struct StopRowView: View {
-    let stop: ClosestStop
+    let stop: stopStop // Updated type
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {

@@ -49,11 +49,11 @@ struct RouteService {
             //print("Raw Data: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
 
             // Decode the JSON response
-            let welcomeResponse = try JSONDecoder().decode(Welcome.self, from: data)
+            let routeResponse = try JSONDecoder().decode(RouteRes.self, from: data)
             //print("Decoded Response: \(welcomeResponse)")
 
             // Return the array of routes
-            return welcomeResponse.routes
+            return routeResponse.routes
 
         } catch {
             // Log the error
