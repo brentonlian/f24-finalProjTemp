@@ -57,21 +57,21 @@ struct NearbyRoutesView: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10) {
                             ForEach(routes, id: \.id) { route in
-                                Button(action: {
-                                    Task {
-                                        await fetchStops(for: route.id)
-                                    }
-                                }) {
-                                    RouteRowView(
-                                        route: route,
-                                        isSelected: Binding(
-                                            get: { selectedRouteID == route.id },
-                                            set: { isSelected in
-                                                selectedRouteID = isSelected ? route.id : nil
-                                            }
-                                        )
+                                RouteRowView(
+                                    route: route,
+                                    onSelect: {
+                                        selectedRouteID = route.id
+                                        Task {
+                                            await fetchStops(for: route.id)
+                                        }
+                                    },
+                                    isSelected: Binding(
+                                        get: { selectedRouteID == route.id },
+                                        set: { isSelected in
+                                            selectedRouteID = isSelected ? route.id : nil
+                                        }
                                     )
-                                }
+                                )
                             }
                         }
                     }
@@ -140,6 +140,7 @@ struct NearbyRoutesView: View {
 
 struct RouteRowView: View {
     let route: Route
+    let onSelect: () -> Void
     @Binding var isSelected: Bool
 
     var body: some View {
@@ -156,6 +157,7 @@ struct RouteRowView: View {
         .cornerRadius(10)
         .onTapGesture {
             isSelected.toggle()
+            onSelect()
         }
     }
 }

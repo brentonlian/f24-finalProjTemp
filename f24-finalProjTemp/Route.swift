@@ -190,3 +190,61 @@ class JSONNull: Codable, Hashable {
             try container.encodeNil()
     }
 }
+
+// This file was generated from JSON Schema using quicktype, do not modify it directly.
+// To parse the JSON, add this file to your project and do:
+//
+//   let welcome = try? JSONDecoder().decode(Welcome.self, from: jsonData)
+
+enum DirectionHeadsign: String, Codable {
+    case manhattan = "Manhattan"
+    case queens = "Queens"
+}
+
+// MARK: - Stop
+struct Stop: Codable {
+    let globalStopID: String
+    let locationType: Int
+    let nextDeparture: NextDeparture
+    let parentStationGlobalStopID: String
+    let routeType: Int
+    let rtStopID, stopCode: String
+    let stopLat, stopLon: Double
+    let stopName: String
+    let wheelchairBoarding: Int
+
+    enum CodingKeys: String, CodingKey {
+        case globalStopID = "global_stop_id"
+        case locationType = "location_type"
+        case nextDeparture = "next_departure"
+        case parentStationGlobalStopID = "parent_station_global_stop_id"
+        case routeType = "route_type"
+        case rtStopID = "rt_stop_id"
+        case stopCode = "stop_code"
+        case stopLat = "stop_lat"
+        case stopLon = "stop_lon"
+        case stopName = "stop_name"
+        case wheelchairBoarding = "wheelchair_boarding"
+    }
+}
+
+// MARK: - NextDeparture
+struct NextDeparture: Codable {
+    let departureTime: Int
+    let isCancelled, isRealTime: Bool
+    let rtTripID: String
+    let scheduledDepartureTime: Int
+    let tripSearchKey: String
+    let wheelchairAccessible: Int
+
+    enum CodingKeys: String, CodingKey {
+        case departureTime = "departure_time"
+        case isCancelled = "is_cancelled"
+        case isRealTime = "is_real_time"
+        case rtTripID = "rt_trip_id"
+        case scheduledDepartureTime = "scheduled_departure_time"
+        case tripSearchKey = "trip_search_key"
+        case wheelchairAccessible = "wheelchair_accessible"
+    }
+}
+
