@@ -6,37 +6,27 @@ struct NearbyRoutesView: View {
     @State private var maxDistance: String = ""
     @State private var routes: [Route] = []
     @State private var selectedRouteID: String?
-    @State private var stops: [stopStop] = [] // Updated type
+    @State private var stops: [stopStop] = []
     @State private var errorMessage: String?
+    @State private var isLoadingRoutes = false
+    @State private var isLoadingStops = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                Text("Nearby Routes Finder")
-                    .font(.headline)
-                    .padding()
+                // Inputs Section
+                InputSection(
+                    latitude: $latitude,
+                    longitude: $longitude,
+                    maxDistance: $maxDistance
+                )
 
-                TextField("Enter Latitude", text: $latitude)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                    .keyboardType(.decimalPad)
-
-                TextField("Enter Longitude", text: $longitude)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                    .keyboardType(.decimalPad)
-
-                TextField("Enter Max Distance", text: $maxDistance)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                    .keyboardType(.numberPad)
-
+                // Fetch Routes Button
                 Button(action: {
+                    isLoadingRoutes = true
                     Task {
                         await fetchNearbyRoutes()
+                        isLoadingRoutes = false
                     }
                 }) {
                     Text("Find Routes")
@@ -48,48 +38,46 @@ struct NearbyRoutesView: View {
                 }
                 .padding(.top)
 
+                // Error Message
                 if let errorMessage = errorMessage {
                     Text("Error: \(errorMessage)")
                         .foregroundColor(.red)
-                }
-
-                if !routes.isEmpty {
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(routes, id: \.id) { route in
-                                RouteRowView(
-                                    route: route,
-                                    onSelect: {
-                                        selectedRouteID = route.id
-                                        Task {
-                                            await fetchStops(for: route.id)
-                                        }
-                                    },
-                                    isSelected: Binding(
-                                        get: { selectedRouteID == route.id },
-                                        set: { isSelected in
-                                            selectedRouteID = isSelected ? route.id : nil
-                                        }
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    .frame(maxHeight: 300)
-                }
-
-                if !stops.isEmpty {
-                    Text("Stops for Route \(selectedRouteID ?? "")")
-                        .font(.headline)
                         .padding(.top)
+                }
 
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(stops, id: \.stopGlobalStopID) { stop in // Updated ID
-                                StopRowView(stop: stop)
+                // Routes Section
+                if isLoadingRoutes {
+                    ProgressView("Loading Routes...")
+                        .padding()
+                } else if !routes.isEmpty {
+                    RoutesListView(
+                        routes: routes,
+                        selectedRouteID: $selectedRouteID,
+                        onSelectRoute: { routeID in
+                            selectedRouteID = routeID
+                            isLoadingStops = true
+                            Task {
+                                await fetchStops(for: routeID)
+                                isLoadingStops = false
                             }
                         }
-                    }
+                    )
+                } else {
+                    Text("No routes found.")
+                        .foregroundColor(.gray)
+                        .padding()
+                }
+
+                // Stops Section
+                if isLoadingStops {
+                    ProgressView("Loading Stops...")
+                        .padding()
+                } else if !stops.isEmpty {
+                    StopsListView(stops: stops)
+                } else if selectedRouteID != nil {
+                    Text("No stops available for the selected route.")
+                        .foregroundColor(.gray)
+                        .padding()
                 }
 
                 Spacer()
@@ -98,6 +86,7 @@ struct NearbyRoutesView: View {
         }
     }
 
+    // MARK: - Fetch Functions
     func fetchNearbyRoutes() async {
         do {
             guard !latitude.isEmpty, !longitude.isEmpty, !maxDistance.isEmpty else {
@@ -138,9 +127,67 @@ struct NearbyRoutesView: View {
     }
 }
 
+// MARK: - Input Section
+struct InputSection: View {
+    @Binding var latitude: String
+    @Binding var longitude: String
+    @Binding var maxDistance: String
+
+    var body: some View {
+        VStack(spacing: 15) {
+            TextField("Enter Latitude", text: $latitude)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .keyboardType(.decimalPad)
+
+            TextField("Enter Longitude", text: $longitude)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .keyboardType(.decimalPad)
+
+            TextField("Enter Max Distance", text: $maxDistance)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .keyboardType(.numberPad)
+        }
+    }
+}
+
+// MARK: - Routes List View
+struct RoutesListView: View {
+    let routes: [Route]
+    @Binding var selectedRouteID: String?
+    let onSelectRoute: (String) -> Void
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 10) {
+                ForEach(routes, id: \.id) { route in
+                    RouteRowView(
+                        route: route,
+                        isSelected: Binding(
+                            get: { selectedRouteID == route.id },
+                            set: { isSelected in
+                                if isSelected {
+                                    selectedRouteID = route.id
+                                    onSelectRoute(route.id)
+                                }
+                            }
+                        )
+                    )
+                }
+            }
+        }
+        .frame(maxHeight: 300)
+    }
+}
+
+// MARK: - Route Row View
 struct RouteRowView: View {
     let route: Route
-    let onSelect: () -> Void
     @Binding var isSelected: Bool
 
     var body: some View {
@@ -157,13 +204,34 @@ struct RouteRowView: View {
         .cornerRadius(10)
         .onTapGesture {
             isSelected.toggle()
-            onSelect()
         }
     }
 }
 
+// MARK: - Stops List View
+struct StopsListView: View {
+    let stops: [stopStop]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Stops")
+                .font(.headline)
+                .padding(.top)
+
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10) {
+                    ForEach(stops, id: \.stopGlobalStopID) { stop in
+                        StopRowView(stop: stop)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Stop Row View
 struct StopRowView: View {
-    let stop: stopStop // Updated type
+    let stop: stopStop
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -190,7 +258,6 @@ struct StopRowView: View {
         .cornerRadius(10)
     }
 }
-
 
 #Preview {
     NearbyRoutesView()
