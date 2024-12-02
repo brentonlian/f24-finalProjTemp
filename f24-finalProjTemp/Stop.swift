@@ -4,13 +4,21 @@ import Foundation
 struct stopWelcome: Codable {
     let stopItineraries: [stopItinerary]
     let stopRoute: stopRoute
+
+    enum CodingKeys: String, CodingKey {
+        case stopItineraries = "itineraries" // Adjust to match the JSON
+        case stopRoute = "route"
+    }
 }
+
+
+
 
 // MARK: - Itinerary
 struct stopItinerary: Codable {
-    let stopBranchCode: String
+    let stopBranchCode: String?
     let stopCanonicalItinerary: Bool
-    let stopDirectionHeadsign: DirectionHeadsign
+    let stopDirectionHeadsign: String // Changed to String from enum
     let stopDirectionID: Int
     let stopHeadsign: String
     let stopIsActive: Bool
@@ -42,7 +50,7 @@ struct stopStop: Codable {
     let stopGlobalStopID: String
     let stopLocationType: Int
     let stopNextDeparture: stopNextDeparture
-    let stopParentStationGlobalStopID: String
+    let stopParentStationGlobalStopID: String?
     let stopRouteType: Int
     let stopRtStopID: String
     let stopStopCode: String

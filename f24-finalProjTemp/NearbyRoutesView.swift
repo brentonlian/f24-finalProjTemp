@@ -85,7 +85,7 @@ struct NearbyRoutesView: View {
 
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(stops, id: \.stopGlobalID) { stop in // Updated ID
+                            ForEach(stops, id: \.stopGlobalStopID) { stop in // Updated ID
                                 StopRowView(stop: stop)
                             }
                         }
@@ -138,20 +138,44 @@ struct NearbyRoutesView: View {
     }
 }
 
+struct RouteRowView: View {
+    let route: Route
+    let onSelect: () -> Void
+    @Binding var isSelected: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(route.routeLongName)
+                .font(.headline)
+                .foregroundColor(isSelected ? .blue : .primary)
+            Text("Short Name: \(route.routeShortName)")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(isSelected ? Color.blue.opacity(0.2) : Color(.systemGray6))
+        .cornerRadius(10)
+        .onTapGesture {
+            isSelected.toggle()
+            onSelect()
+        }
+    }
+}
+
 struct StopRowView: View {
     let stop: stopStop // Updated type
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(stop.stopName)
+            Text(stop.stopStopName)
                 .font(.headline)
-            Text("Latitude: \(stop.stopLat)")
+            Text("Latitude: \(stop.stopStopLat)")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            Text("Longitude: \(stop.stopLon)")
+            Text("Longitude: \(stop.stopStopLon)")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            if stop.wheelchairBoarding == 1 {
+            if stop.stopWheelchairBoarding == 1 {
                 Text("Wheelchair Accessible")
                     .font(.caption)
                     .foregroundColor(.green)
@@ -166,6 +190,7 @@ struct StopRowView: View {
         .cornerRadius(10)
     }
 }
+
 
 #Preview {
     NearbyRoutesView()
