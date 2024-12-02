@@ -46,7 +46,7 @@ struct stopItinerary: Codable {
 //}
 
 // MARK: - Stop
-struct stopStop: Codable {
+struct stopStop: Codable, Identifiable {
     let stopGlobalStopID: String
     let stopLocationType: Int
     let stopNextDeparture: stopNextDeparture
@@ -58,6 +58,9 @@ struct stopStop: Codable {
     let stopStopLon: Double
     let stopStopName: String
     let stopWheelchairBoarding: Int
+
+    // Use `stopGlobalStopID` as the unique identifier
+    var id: String { stopGlobalStopID }
 
     enum CodingKeys: String, CodingKey {
         case stopGlobalStopID = "global_stop_id"
@@ -73,6 +76,7 @@ struct stopStop: Codable {
         case stopWheelchairBoarding = "wheelchair_boarding"
     }
 }
+
 
 // MARK: - NextDeparture
 struct stopNextDeparture: Codable {

@@ -1,4 +1,5 @@
 import SwiftUI
+import MapKit
 
 struct NearbyRoutesView: View {
     @State private var latitude: String = ""
@@ -150,7 +151,7 @@ struct InputSection: View {
                 .cornerRadius(10)
                 .keyboardType(.decimalPad)
 
-            TextField("Enter Max Distance", text: $maxDistance)
+            TextField("Enter Max Distance: 0-1500 Meters", text: $maxDistance)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
@@ -211,16 +212,57 @@ struct RouteRowView: View {
     }
 }
 
-// MARK: - Stops List View
+
+//Plot coordinates on map
 struct StopsListView: View {
     let stops: [stopStop]
+    @State private var region: MKCoordinateRegion
+
+    init(stops: [stopStop]) {
+        self.stops = stops
+        // Initialize the map region around the first stop, or provide a default region
+        if let firstStop = stops.first {
+            self._region = State(initialValue: MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: firstStop.stopStopLat, longitude: firstStop.stopStopLon),
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            ))
+        } else {
+            self._region = State(initialValue: MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            ))
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Stops")
+            Text("Stops Map")
                 .font(.headline)
                 .padding(.top)
 
+            // Map View
+            Map(coordinateRegion: $region, annotationItems: stops) { stop in
+                MapAnnotation(
+                    coordinate: CLLocationCoordinate2D(latitude: stop.stopStopLat, longitude: stop.stopStopLon)
+                ) {
+                    VStack {
+                        Image(systemName: "mappin.circle.fill")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(.red)
+                        Text(stop.stopStopName)
+                            .font(.caption)
+                            .foregroundColor(.black)
+                    }
+                }
+            }
+            .frame(height: 300)
+            .cornerRadius(10)
+            .padding(.bottom)
+
+            // List of Stops
+            Text("Stops List")
+                .font(.headline)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
                     ForEach(stops, id: \.stopGlobalStopID) { stop in
@@ -229,8 +271,10 @@ struct StopsListView: View {
                 }
             }
         }
+        .padding()
     }
 }
+
 
 // MARK: - Stop Row View
 struct StopRowView: View {
