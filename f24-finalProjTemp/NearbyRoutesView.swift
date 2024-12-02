@@ -13,80 +13,83 @@ struct NearbyRoutesView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                // Inputs Section
-                InputSection(
-                    latitude: $latitude,
-                    longitude: $longitude,
-                    maxDistance: $maxDistance
-                )
-
-                // Fetch Routes Button
-                Button(action: {
-                    isLoadingRoutes = true
-                    Task {
-                        await fetchNearbyRoutes()
-                        isLoadingRoutes = false
-                    }
-                }) {
-                    Text("Find Routes")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding(.top)
-
-                // Error Message
-                if let errorMessage = errorMessage {
-                    Text("Error: \(errorMessage)")
-                        .foregroundColor(.red)
-                        .padding(.top)
-                }
-
-                // Routes Section
-                if isLoadingRoutes {
-                    ProgressView("Loading Routes...")
-                        .padding()
-                } else if !routes.isEmpty {
-                    RoutesListView(
-                        routes: routes,
-                        selectedRouteID: $selectedRouteID,
-                        onSelectRoute: { routeID in
-                            selectedRouteID = routeID
-                            isLoadingStops = true
-                            Task {
-                                await fetchStops(for: routeID)
-                                isLoadingStops = false
+            if !stops.isEmpty {
+                // Full-screen stops view
+                StopsListView(stops: stops)
+                    .navigationTitle("Stops")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Back") {
+                                stops = [] // Clear stops to return to the main view
                             }
                         }
+                    }
+            } else {
+                // Main view
+                VStack(spacing: 20) {
+                    // Inputs Section
+                    InputSection(
+                        latitude: $latitude,
+                        longitude: $longitude,
+                        maxDistance: $maxDistance
                     )
-                } else {
-                    Text("No routes found.")
-                        .foregroundColor(.gray)
-                        .padding()
-                }
 
-                // Stops Section
-                if isLoadingStops {
-                    ProgressView("Loading Stops...")
-                        .padding()
-                } else if !stops.isEmpty {
-                    StopsListView(stops: stops)
-                } else if selectedRouteID != nil {
-                    Text("No stops available for the selected route.")
-                        .foregroundColor(.gray)
-                        .padding()
-                }
+                    // Fetch Routes Button
+                    Button(action: {
+                        isLoadingRoutes = true
+                        Task {
+                            await fetchNearbyRoutes()
+                            isLoadingRoutes = false
+                        }
+                    }) {
+                        Text("Find Routes")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.top)
 
-                Spacer()
+                    // Error Message
+                    if let errorMessage = errorMessage {
+                        Text("Error: \(errorMessage)")
+                            .foregroundColor(.red)
+                            .padding(.top)
+                    }
+
+                    // Routes Section
+                    if isLoadingRoutes {
+                        ProgressView("Loading Routes...")
+                            .padding()
+                    } else if !routes.isEmpty {
+                        RoutesListView(
+                            routes: routes,
+                            selectedRouteID: $selectedRouteID,
+                            onSelectRoute: { routeID in
+                                selectedRouteID = routeID
+                                isLoadingStops = true
+                                Task {
+                                    await fetchStops(for: routeID)
+                                    isLoadingStops = false
+                                }
+                            }
+                        )
+                    } else {
+                        Text("No routes found.")
+                            .foregroundColor(.gray)
+                            .padding()
+                    }
+
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle("Nearby Routes")
             }
-            .padding()
         }
     }
 
-    // MARK: - Fetch Functions
+    // Fetch Functions
     func fetchNearbyRoutes() async {
         do {
             guard !latitude.isEmpty, !longitude.isEmpty, !maxDistance.isEmpty else {
