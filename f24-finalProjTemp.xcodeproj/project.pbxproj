@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DBED5BED2CFEB98F0087988A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBED5BEC2CFEB98F0087988A /* LocationManager.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DB9020762CEBC79400EC77DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -23,10 +27,24 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DBED5BE72CFEB8AD0087988A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		DB9020652CEBC79200EC77DB /* f24-finalProjTemp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "f24-finalProjTemp.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB9020752CEBC79400EC77DB /* f24-finalProjTempTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "f24-finalProjTempTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB90207F2CEBC79400EC77DB /* f24-finalProjTempUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "f24-finalProjTempUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBED5BEC2CFEB98F0087988A /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -43,6 +61,11 @@
 		DB9020822CEBC79400EC77DB /* f24-finalProjTempUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "f24-finalProjTempUITests";
+			sourceTree = "<group>";
+		};
+		DBED5BE02CFEB8AD0087988A /* Privacy - Location When In Use Usage Description */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Privacy - Location When In Use Usage Description";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -78,7 +101,9 @@
 				DB9020672CEBC79200EC77DB /* f24-finalProjTemp */,
 				DB9020782CEBC79400EC77DB /* f24-finalProjTempTests */,
 				DB9020822CEBC79400EC77DB /* f24-finalProjTempUITests */,
+				DBED5BE02CFEB8AD0087988A /* Privacy - Location When In Use Usage Description */,
 				DB9020662CEBC79200EC77DB /* Products */,
+				DBED5BEC2CFEB98F0087988A /* LocationManager.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,6 +127,7 @@
 				DB9020612CEBC79200EC77DB /* Sources */,
 				DB9020622CEBC79200EC77DB /* Frameworks */,
 				DB9020632CEBC79200EC77DB /* Resources */,
+				DBED5BE72CFEB8AD0087988A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -236,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBED5BED2CFEB98F0087988A /* LocationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,6 +425,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"f24-finalProjTemp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app needs access to your location to provide location-based services";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -426,6 +454,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"f24-finalProjTemp/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "The app needs access to your location to provide location-based services";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

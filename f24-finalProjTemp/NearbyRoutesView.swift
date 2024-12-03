@@ -17,13 +17,24 @@ struct NearbyRoutesView: View {
             if !stops.isEmpty {
                 // Full-screen stops view
                 StopsListView(stops: stops)
-                    .navigationTitle("Stops")
+                    .navigationTitle(selectedRouteName)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button("Back") {
                                 stops = [] // Clear stops to return to the main view
+                                //unselect route
+                                selectedRouteID = nil
+                                
+                                
                             }
+                            
                         }
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Text(selectedRouteNameShort)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+
                     }
             } else {
                 // Main view
@@ -83,12 +94,38 @@ struct NearbyRoutesView: View {
                     }
 
                     Spacer()
+                    
                 }
                 .padding()
                 .navigationTitle("Nearby Routes")
+
+                // Footer
+                Text("Powered by Transit API")
+                .font(.footnote)
+                .foregroundColor(.gray)
+                .padding(.bottom)
+                
             }
         }
     }
+    
+    //Find selected route name
+    private var selectedRouteName: String {
+            if let routeID = selectedRouteID,
+               let route = routes.first(where: { $0.id == routeID }) {
+                return route.routeLongName
+            }
+            return "Nearby Routes" // Default title
+        }
+    
+    //Find selected route shortname
+    private var selectedRouteNameShort: String {
+            if let routeID = selectedRouteID,
+               let route = routes.first(where: { $0.id == routeID }) {
+                return route.routeShortName
+            }
+            return "Nearby Routes" // Default title
+        }
 
     // Fetch Functions
     func fetchNearbyRoutes() async {
@@ -188,6 +225,8 @@ struct RoutesListView: View {
         .frame(maxHeight: 300)
     }
 }
+
+
 
 // MARK: - Route Row View
 struct RouteRowView: View {
@@ -309,3 +348,5 @@ struct StopRowView: View {
 #Preview {
     NearbyRoutesView()
 }
+
+
